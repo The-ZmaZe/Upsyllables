@@ -23,12 +23,12 @@ class CulturalGroup():
         self.syllable_dict = syllable_dict
         self.words_length = words_length
 
-    def generator(self, nb) -> tuple:
+    def generator(self, n) -> tuple:
         """Generate nb words according to current CulturalGroup's args
         """
         words = list()
 
-        for i in range(nb):
+        for i in range(n):
             word = ""
             current_syllables = self.syllable_dict
             word_length = random.choices(list(self.words_length.keys()),
@@ -50,7 +50,7 @@ class CulturalGroup():
                     if element[0] == syllable[2]:
                         current_syllables[element] -= 1
 
-            words += [word]
+            words.append(word)
         return tuple(words)
 
 
