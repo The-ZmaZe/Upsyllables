@@ -1,6 +1,6 @@
 #  if it works, it works.
 #  Copyright Nathan Duranel, 2021
-#  Distributed under the terms of the license GNU GPLv2, detailled in LICENSE
+#  Distributed under the terms of the license GNU GPLv3, detailled in LICENSE
 
 __version__ = "0.1"
 __author__ = "The_ZmaZe - github.com/The-ZmaZe/"
@@ -24,7 +24,7 @@ class CulturalGroup():
         self.words_length = words_length
 
     def generator(self, n) -> tuple:
-        """Generate nb words according to current CulturalGroup's args
+        """Generate n words according to current CulturalGroup's args
         """
         words = list()
 
@@ -115,7 +115,7 @@ def structure_generator(syllables_list: Iterable[str]=syllables_lister(),
     return syllables_dict, words_length
 
 
-# quite a bad idea
+# bad results (for now)
 def syllable_gen(weights: dict) -> str:
     """Return 3 letter syllable
         Parameter:
