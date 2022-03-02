@@ -8,7 +8,7 @@ __author__ = "The_ZmaZe - github.com/The-ZmaZe/"
 
 import string
 import random
-from typing import Iterable, NoReturn
+from typing import Iterable, Tuple, NoReturn
 
 
 ALPHABET = tuple(string.ascii_lowercase)
@@ -71,7 +71,7 @@ def syllables_lister() -> tuple:
 def structure_generator(syllables_list: Iterable[str]=syllables_lister(),
                         vowels_weight: int=5,
                         consonants_weight: int=3,
-                        **weight) -> tuple[dict]:
+                        **weight) -> Tuple[dict]:
     """Generate randomly and return a tuple containing:
         0: syllables_dict
         1: words_length
@@ -107,7 +107,7 @@ def structure_generator(syllables_list: Iterable[str]=syllables_lister(),
                     (2, 3, 2, 1),
                     (3, 3, 2, 1),
                     (3, 3, 1, 1),
-                    (4, 3, 1, 0))
+                    (4, 3, 1, 0)) # i.e. 8 syllables words have 0 chance to be very frequent
 
     words_length = {i+1: random.choices((1, 2, 3, 4), weights=elem, k=1)[0]
             for i, elem in enumerate(weights_list)}
