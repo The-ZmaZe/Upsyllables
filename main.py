@@ -10,6 +10,8 @@ import string
 import random
 from typing import Iterable, Tuple, NoReturn
 
+from matplotlib import use
+
 
 ALPHABET = tuple(string.ascii_lowercase)
 VOWELS = ("a", "e", "i", "o", "u", "y")
@@ -39,23 +41,23 @@ class CulturalGroup():
                                           weights=current_syllables.values(),
                                           k=1)[0]
                 word += syllable
-                current_syllables[syllable] -= 1
+                # current_syllables[syllable] -= 1
 
-                if syllable[2] in VOWELS:
-                    for element in tuple(current_syllables.keys()):
-                        if element[0] in CONSONANTS:
-                            current_syllables[element] += 1
+                # if syllable[2] in VOWELS:
+                #     for element in tuple(current_syllables.keys()):
+                #         if element[0] in CONSONANTS:
+                #             current_syllables[element] += 1
 
-                if syllable[2] in CONSONANTS:
-                    for element in tuple(current_syllables.keys()):
-                        if element[0] in CONSONANTS:
-                            current_syllables[element] -= 0.5
-                        if element[0] in VOWELS:
-                            current_syllables[element] += 1
+                # if syllable[2] in CONSONANTS:
+                #     for element in tuple(current_syllables.keys()):
+                #         if element[0] in CONSONANTS:
+                #             current_syllables[element] -= 0.5
+                #         if element[0] in VOWELS:
+                #             current_syllables[element] += 1
 
-                for element in tuple(current_syllables.keys()):
-                    if element[0] == syllable[2]:
-                        current_syllables[element] -= 1
+                # for element in tuple(current_syllables.keys()):
+                #     if element[0] == syllable[2]:
+                #         current_syllables[element] -= 1
 
                 #print(current_syllables)
 
@@ -71,6 +73,7 @@ def syllables_lister() -> tuple:
 def structure_generator(syllables_list: Iterable[str]=syllables_lister(),
                         vowels_weight: int=5,
                         consonants_weight: int=3,
+                        syllable_gen_quantity=0,
                         **weight) -> Tuple[dict]:
     """Generate randomly and return a tuple containing:
         0: syllables_dict
@@ -80,6 +83,8 @@ def structure_generator(syllables_list: Iterable[str]=syllables_lister(),
             syllables_list - Iterable[str] - syllables
             vowels_weight - int - base weight of vowels
             consonants_weight - int - base weight of consonants
+            syllable_gen_quantity - int - if not set to 0,
+                it will generate n syllables to replace syllables_list
             weight - specific weight of a letter, example: a=2
     """
     weights_list = list()
@@ -96,10 +101,14 @@ def structure_generator(syllables_list: Iterable[str]=syllables_lister(),
                 weights_list.append(int(consonants_weight))
     weights = dict(zip(ALPHABET, weights_list))
 
+    if syllable_gen_quantity:
+        syllables_list = tuple(
+            syllable_gen(weights) for i in range(syllable_gen_quantity))
+
     syllables_dict = dict(zip(syllables_list,
         (random.randint(1,5) for i in range(len(syllables_list)))))
-    # print(syllables)
-    # print(syllables_dict)
+    print(syllables_dict)
+
     weights_list = ((1, 3, 2, 2),
                     (1, 2, 3, 1),
                     (1, 3, 2, 1),
@@ -107,7 +116,7 @@ def structure_generator(syllables_list: Iterable[str]=syllables_lister(),
                     (2, 3, 2, 1),
                     (3, 3, 2, 1),
                     (3, 3, 1, 1),
-                    (4, 3, 1, 0)) # i.e. 8 syllables words have 0 chance to be very frequent
+                    (4, 3, 1, 0)) # i.e. 8 syllables words have 0 chance to be very common
 
     words_length = {i+1: random.choices((1, 2, 3, 4), weights=elem, k=1)[0]
             for i, elem in enumerate(weights_list)}
@@ -115,33 +124,62 @@ def structure_generator(syllables_list: Iterable[str]=syllables_lister(),
     return syllables_dict, words_length
 
 
-# bad results (for now)
-def syllable_gen(weights: dict) -> str:
+def syllable_gen(weights, struct="cvc"):
     """Return 3 letter syllable
         Parameter:
             weights - dict - contain all letters as keys and weight as value
     """
-    syllable = str()
-    curr_weights = weights
-    for i in range(3):
-        letter = random.choices(tuple(weights.keys()),
-                                tuple(curr_weights.values()))[0]
-        syllable += letter
-
-        curr_weights = weights
+    vowels_weights = dict()
+    consonants_weights = dict()
+    for letter in weights.keys():
         if letter in VOWELS:
-            for element in tuple(weights.keys()):
-                if element in CONSONANTS:
-                    curr_weights[element] += 2
-                else:
-                    curr_weights[element] -= 1
+            vowels_weights[letter] = weights[letter]
         else:
-            for element in tuple(weights.keys()):
-                if element in CONSONANTS:
-                    curr_weights[element] -= 1
-                else:
-                    curr_weights[element] += 1
+            consonants_weights[letter] = weights[letter]
+
+    syllable = ""
+    for char in struct:
+        if char == "c":
+            syllable += random.choices(tuple(consonants_weights.keys()),
+                                       weights=consonants_weights.values(),
+                                       k=1)[0]
+        elif char == "v":
+            syllable += random.choices(tuple(vowels_weights.keys()),
+                                       weights=vowels_weights.values(),
+                                       k=1)[0]
+
     return syllable
+
+
+
+
+# # bad results (for now)
+# def syllable_gen(weights: dict) -> str:
+#     """Return 3 letter syllable
+#         Parameter:
+#             weights - dict - contain all letters as keys and weight as value
+#     """
+#     syllable = str()
+#     curr_weights = weights
+#     for i in range(3):
+#         letter = random.choices(tuple(weights.keys()),
+#                                 tuple(curr_weights.values()))[0]
+#         syllable += letter
+
+#         curr_weights = weights
+#         if letter in VOWELS:
+#             for element in tuple(weights.keys()):
+#                 if element in CONSONANTS:
+#                     curr_weights[element] += 2
+#                 else:
+#                     curr_weights[element] -= 1
+#         else:
+#             for element in tuple(weights.keys()):
+#                 if element in CONSONANTS:
+#                     curr_weights[element] -= 1
+#                 else:
+#                     curr_weights[element] += 1
+#     return syllable
 
 
 
@@ -185,9 +223,13 @@ if __name__=="__main__":
         8: 1
     }
 
-    group_a = CulturalGroup(syllables, words_length)
-    print(group_a.generator(10))
+    # group_a = CulturalGroup(syllables, words_length)
+    # print(group_a.generator(10))
 
-    a, b = structure_generator()
-    group_b = CulturalGroup(a, b)
-    print(group_b.generator(10))
+    # a, b = structure_generator()
+    # group_b = CulturalGroup(a, b)
+    # print(group_b.generator(10))
+
+    a, b = structure_generator(syllable_gen_quantity=1000)
+    group_c = CulturalGroup(a, b)
+    print(group_c.generator(10))
